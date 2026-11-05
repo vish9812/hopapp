@@ -24,4 +24,9 @@ For development, run `just build` followed by `just run`. Without just, run `bas
 
 Builds are signed ad hoc; rebuilding may require granting Accessibility access again. Window matching uses an undocumented macOS API and may break after OS updates.
 
+## More macOS tools
+
+- [DockNine](https://github.com/vish9812/docknine): Launch pinned Dock apps with Option+1–9.
+- [backspin](https://github.com/vish9812/backspin): Reverse the mouse wheel while the trackpad keeps natural scrolling.
+
 [MIT License](LICENSE)
