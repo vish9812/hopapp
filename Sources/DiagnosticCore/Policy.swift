@@ -1,3 +1,4 @@
+import ApplicationServices
 import Foundation
 
 public struct WindowFacts {
@@ -86,5 +87,14 @@ public struct FocusGuard {
         if !sameProcess { return "owner_process_changed" }
         if !sameAXElement || !sameWindowID { return "exact_target_identity_changed" }
         return nil
+    }
+}
+
+public enum FocusStep {
+    /// Raise and focus requests are advisory: some apps (System Settings) reject AXRaise while still
+    /// activating normally, so only errors that put the target in doubt abort a switch. The caller's
+    /// final focused-window confirmation is what decides success.
+    public static func accepts(_ error: AXError) -> Bool {
+        [.success, .attributeUnsupported, .actionUnsupported, .notImplemented].contains(error)
     }
 }

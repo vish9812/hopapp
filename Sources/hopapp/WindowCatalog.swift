@@ -221,15 +221,15 @@ final class WindowCatalog {
             }
         }
         guard allowed() else { return "Selected window is no longer available" }
-        guard AXUIElementPerformAction(target.element, kAXRaiseAction as CFString) == .success else { return "Could not raise selected window" }
+        guard FocusStep.accepts(AXUIElementPerformAction(target.element, kAXRaiseAction as CFString)) else { return "Could not raise selected window" }
         for attribute in [kAXMainAttribute, kAXFocusedAttribute] {
             guard allowed() else { return "Switch cancelled because the window or desktop changed" }
             let error = AXUIElementSetAttributeValue(target.element, attribute as CFString, kCFBooleanTrue)
-            guard error == .success || error == .attributeUnsupported || error == .notImplemented else { return "Window did not accept focus" }
+            guard FocusStep.accepts(error) else { return "Window did not accept focus" }
         }
         guard allowed() else { return "Switch cancelled because the window or desktop changed" }
         let activated = DispatchQueue.main.sync { validity.isValid && !app.isHidden && !app.isTerminated && app.activate(options: [.activateIgnoringOtherApps]) }
-        guard activated, allowed(), AXUIElementPerformAction(target.element, kAXRaiseAction as CFString) == .success else {
+        guard activated, allowed(), FocusStep.accepts(AXUIElementPerformAction(target.element, kAXRaiseAction as CFString)) else {
             return "Could not activate selected window"
         }
         let system = AXUIElementCreateSystemWide()

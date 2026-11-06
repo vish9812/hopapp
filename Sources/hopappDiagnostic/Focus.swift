@@ -105,13 +105,13 @@ final class FocusOperation {
         if let reason = immediateRefusal() { finish("cancelled", reason); return }
         let raised = AXUIElementPerformAction(target.element, kAXRaiseAction as CFString)
         steps.append(["operation": "AXRaise_before_activation", "result": axError(raised)])
-        guard raised == .success else { finish("failed", axError(raised)); return }
+        guard FocusStep.accepts(raised) else { finish("failed", axError(raised)); return }
 
         for attribute in [kAXMainAttribute, kAXFocusedAttribute] {
             if let reason = immediateRefusal() { finish("failed", reason); return }
             let error = AXUIElementSetAttributeValue(target.element, attribute as CFString, kCFBooleanTrue)
             steps.append(["operation": "set_\(attribute)", "result": axError(error)])
-            if error != .success && error != .attributeUnsupported && error != .notImplemented {
+            if !FocusStep.accepts(error) {
                 finish("failed", axError(error)); return
             }
         }
@@ -122,7 +122,7 @@ final class FocusOperation {
         if let reason = immediateRefusal() { finish("failed", reason); return }
         let raisedAgain = AXUIElementPerformAction(target.element, kAXRaiseAction as CFString)
         steps.append(["operation": "AXRaise_after_activation", "result": axError(raisedAgain)])
-        guard raisedAgain == .success else { finish("failed", axError(raisedAgain)); return }
+        guard FocusStep.accepts(raisedAgain) else { finish("failed", axError(raisedAgain)); return }
 
         let system = AXUIElementCreateSystemWide()
         AXUIElementSetMessagingTimeout(system, inventory.options.timeout)
